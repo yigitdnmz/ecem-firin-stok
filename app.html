@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<title>Ecem Fırın | Stok</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body{font-family:Arial;background:#f2f2f2;margin:0}
+.container{max-width:1100px;margin:30px auto;background:#fff;padding:30px;border-radius:12px}
+h1{margin:0}
+input,select,button{padding:10px;font-size:14px}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+table{width:100%;border-collapse:collapse;margin-top:20px}
+th,td{border:1px solid #ddd;padding:10px;text-align:center}
+.btn{cursor:pointer;border:none;border-radius:6px}
+.add{background:#4caf50;color:white}
+.plus{background:#2196f3;color:white}
+.minus{background:#ff9800;color:white}
+.del{background:#f44336;color:white}
+tr:hover{background:#fafafa}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Ecem Fırın</h1>
+  <h2>Sigara Stok Takibi</h2>
+
+  <div class="row">
+    <input id="name" placeholder="Sigara adı">
+    <input id="group" placeholder="Grup (Marlboro, Tekel...)">
+    <input id="stock" type="number" value="1" min="1">
+    <button class="btn add" onclick="add()">+ Ekle</button>
+  </div>
+
+  <div class="row">
+    <input id="search" placeholder="Ara..." oninput="render()">
+    <select id="filter" onchange="render()">
+      <option value="">Tüm Gruplar</option>
+    </select>
+  </div>
+
+  
+
+  <table>
+    <thead>
+      <tr>
+        <th>Sigara</th>
+        <th>Grup</th>
+        <th>Stok</th>
+        <th>İşlem</th>
+      </tr>
+    </thead>
+    <tbody id="list"></tbody>
+  </table>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, addDoc, doc, updateDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBbI2I2qyi8OfIPZvtp-ImkVOTec8VbM2k",
+  authDomain: "ecem-firin-stok.firebaseapp.com",
+  projectId: "ecem-firin-stok",
+  storageBucket: "ecem-firin-stok.firebasestorage.app",
+  messagingSenderId: "99634330468",
+  appId: "1:99634330468:web:cca79eba162a07cee0d871"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const ref = collection(db,"cigarettes");
+
+const nameEl = document.getElementById("name");
+const groupEl = document.getElementById("group");
+const stockEl = document.getElementById("stock");
+const list = document.getElementById("list");
+const search = document.getElementById("search");
+const filter = document.getElementById("filter");
+
+let data = [];
+
+onSnapshot(ref,snap=>{
+  data = snap.docs.map(d=>({...d.data(),id:d.id}));
+  render();
+  loadGroups();
+});
+
+window.add = async () => {
+  const name = nameEl.value.trim();
+  const group = groupEl.value.trim();
+  const stock = Number(stockEl.value);
+
+  if (!name || !group || stock <= 0) return;
+
+  await addDoc(ref, { name, group, stock });
+
+  nameEl.value = "";
+  groupEl.value = "";
+  stockEl.value = 1;
+};
+
+window.render = ()=>{
+  list.innerHTML="";
+  const s = search.value.toLowerCase();
+  const f = filter.value;
+
+  data
+    .filter(x =>
+      (!s || x.name.toLowerCase().includes(s)) &&
+      (!f || x.group === f)
+    )
+    .forEach(x=>{
+      list.innerHTML += `
+      <tr onclick="selectItem('${x.id}')">
+        <td>${x.name}</td>
+        <td>${x.group}</td>
+        <td>${x.stock}</td>
+        <td>
+          <button class="btn plus" onclick="inc('${x.id}',event)">+</button>
+          <button class="btn minus" onclick="dec('${x.id}',event)">-</button>
+          <button class="btn del" onclick="removeItem('${x.id}',event)">Sil</button>
+        </td>
+      </tr>`;
+    });
+};
+
+window.loadGroups = ()=>{
+  const gs=[...new Set(data.map(x=>x.group))];
+  filter.innerHTML=`<option value="">Tüm Gruplar</option>`+
+    gs.map(g=>`<option>${g}</option>`).join("");
+};
+
+window.inc = (id,e)=>{ e.stopPropagation(); update(id,1); };
+window.dec = (id,e)=>{ e.stopPropagation(); update(id,-1); };
+
+window.removeItem = async (id,e)=>{
+  e.stopPropagation();
+  if (!confirm("Bu ürünü silmek istediğine emin misin?")) return;
+  await deleteDoc(doc(db,"cigarettes",id));
+};
+
+async function update(id,v){
+  const x = data.find(i=>i.id===id);
+  if (!x || x.stock + v < 0) return;
+  await updateDoc(doc(db,"cigarettes",id),{stock:x.stock+v});
+}
+
+window.selectItem = id=>{
+  const x = data.find(i=>i.id===id);
+  if (!x) return;
+  nameEl.value = x.name;
+  groupEl.value = x.group;
+  stockEl.value = 1;
+};
+</script>
+
+</body>
+</html>

@@ -1,0 +1,148 @@
+body {
+  font-family: Arial;
+  padding: 20px;
+}
+.center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+.card {
+  width: 300px;
+}
+input, button {
+  width: 100%;
+  margin: 5px 0;
+  padding: 8px;
+}
+ul {
+  list-style: none;
+  padding: 0;
+}
+li {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 5px;
+}
+
+/* ====== TOPLAM ALANI ====== */
+#totals{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  padding:12px;
+  background:#f9f9f9;
+  border-radius:10px;
+  border:1px solid #eee;
+}
+
+#totals h3{
+  margin:0;
+  font-size:18px;
+  color:#333;
+}
+
+#totalStock{
+  color:#4caf50;
+  font-weight:bold;
+}
+
+#groupTotals{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+}
+
+#groupTotals div{
+  background:#e3f2fd;
+  color:#0d47a1;
+  padding:6px 10px;
+  border-radius:20px;
+  font-size:13px;
+  font-weight:bold;
+}
+
+/* ====== BUTON HİSSİYATI ====== */
+.btn{
+  transition:all .15s ease;
+}
+
+.btn:active{
+  transform:scale(0.95);
+}
+
+.add:hover{background:#43a047}
+.plus:hover{background:#1e88e5}
+.minus:hover{background:#fb8c00}
+.del:hover{background:#e53935}
+
+/* ====== MASAÜSTÜ TABLO ====== */
+table{
+  box-shadow:0 4px 10px rgba(0,0,0,.05);
+  border-radius:10px;
+  overflow:hidden;
+}
+
+thead{
+  background:#fafafa;
+}
+
+th{
+  font-size:13px;
+  color:#555;
+}
+
+/* ====== MOBİL KART TASARIM ====== */
+@media (max-width: 768px){
+
+  tbody tr{
+    box-shadow:0 4px 12px rgba(0,0,0,.08);
+    transition:.2s;
+  }
+
+  tbody tr:active{
+    transform:scale(0.98);
+  }
+
+  tbody td{
+    font-size:15px;
+  }
+
+  tbody td:nth-child(1){
+    font-size:17px;
+    font-weight:bold;
+    color:#333;
+  }
+
+  tbody td:nth-child(3){
+    font-weight:bold;
+    color:#4caf50;
+  }
+
+  tbody td:last-child{
+    margin-top:8px;
+  }
+
+  .btn{
+    min-width:44px;
+    min-height:44px;
+  }
+}
+
+/* ====== INPUT & SELECT ====== */
+input,select{
+  border:1px solid #ddd;
+  border-radius:8px;
+  outline:none;
+}
+
+input:focus,select:focus{
+  border-color:#2196f3;
+  box-shadow:0 0 0 2px rgba(33,150,243,.15);
+}
+
+/* ====== GENEL DOKUNUŞ ====== */
+body{
+  -webkit-tap-highlight-color: transparent;
+}
